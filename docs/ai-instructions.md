@@ -72,15 +72,15 @@ Python 3.14. No compatibility shims or version guards for earlier releases.
 - Full type hints on every signature, tests included.
 - No blocking I/O in an async path; wrap unavoidable blocking calls in `asyncio.to_thread`.
 
-### Architecture
+### Module boundaries
 
 - **CLI** — Typer for commands, Rich for rendering. The CLI is a thin shell: it parses arguments,
   builds dependencies, and delegates. No business logic in a command function. `src/app/cli.py` is
   the reference for command shape.
-- **Always use the `Annotated` style** for arguments and options. Never pass `typer.Argument(...)`
-  or `typer.Option(...)` as a parameter default.
-- An `async` implementation is invoked from a sync command via a single `asyncio.run` at that
-  boundary. Never call `asyncio.run` below the CLI layer.
+  - **Always use the `Annotated` style** for arguments and options. Never pass
+    `typer.Argument(...)` or `typer.Option(...)` as a parameter default.
+  - An `async` implementation is invoked from a sync command via a single `asyncio.run` at that
+    boundary. Never call `asyncio.run` below the CLI layer.
 - **Data models** — Pydantic v2 for anything crossing a boundary: external API responses, persisted
   rows, tool inputs and outputs. No bare dicts for long-lived data.
 - **Configuration** — `src/app/config.py` owns settings loading. Never construct a `Dynaconf`
