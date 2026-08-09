@@ -22,8 +22,9 @@ Extend those files; never regenerate them.
 A rule is **non-negotiable** when breaking it is irreversible, weakens security, or erases a
 module boundary — leaked or committed credentials, `Dynaconf` outside `config.py`, `asyncio.run`
 below the CLI layer, a blanket `# type: ignore` or a loosened tool mode, a bare dict crossing a
-boundary, regenerating committed config, an unpinned CI action. Everything else here is a
-convention: follow it, but a request to change it is just a request.
+boundary, regenerating committed config, an unpinned CI action, anything that makes a test pass
+without running. Everything else here is a convention: follow it, but a request to change it is
+just a request.
 
 Treat a change to a non-negotiable as a design change, not a task. Before implementing one, in a
 short paragraph: name the rule, state concretely what breaks without it, and offer the smallest
@@ -36,7 +37,8 @@ alternative that still meets the underlying need. Then stop and wait.
   hedge the implementation, or leave the old path in place as a safety net.
 - **Never weaken one silently** to make a task easier — not by loosening a tool setting, not by
   adding a blanket ignore, not by routing around a boundary.
-- Do not object over conventions: line length, naming, file placement, or which test style to use.
+- Do not object over conventions: line length, naming, file placement, or how a test is organised
+  inside the pytest idiom.
 
 ## Environment
 
@@ -131,7 +133,9 @@ are acceptable only at a library boundary, with the reason stated.
 
 ### Testing
 
-- pytest. Never `unittest.TestCase` classes.
+- pytest. Never `unittest.TestCase` classes: they silently disable fixtures and
+  `parametrize`, and an `async def` method inside one is never awaited — it reports as passing
+  without running.
 - `tests/` mirrors `src/`, annotated like any other code.
 - Tests needing network or real credentials are marked, deselected by default, and given their own
   task. They never run in CI.
