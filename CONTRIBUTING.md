@@ -10,8 +10,10 @@ privately instead of opening an issue — see the [security policy](SECURITY.md)
 
 ## Read this first
 
-[`docs/ai-instructions.md`](docs/ai-instructions.md) is the single source of truth and binds humans
-and AI tools alike. This file does not repeat it.
+[`docs/ai-instructions.md`](docs/ai-instructions.md) is the source of truth for the platform and
+binds humans and AI tools alike. Application conventions layer on top of it in
+[`docs/ai-instructions-application.md`](docs/ai-instructions-application.md). This file repeats
+neither.
 
 Start with [Changes to these rules](docs/ai-instructions.md#changes-to-these-rules): it marks which
 rules are non-negotiable and what to do when a change would trade one away. The rest covers

@@ -1,10 +1,11 @@
-# AI Instructions — Python platform conventions
+# AI Instructions — platform
 
-Single source of truth for all AI coding tools (Claude Code, GitHub Copilot) working in this repo.
+Source of truth for all AI coding tools (Claude Code, GitHub Copilot) working in this repo.
 `CLAUDE.md` and `.github/copilot-instructions.md` both point here.
 
-Scope: the Python platform. Application conventions live in a separate document that references
-this one.
+Scope: the Python platform. Application conventions live in
+[`ai-instructions-application.md`](ai-instructions-application.md), which references this one and
+defers to it wherever the two would conflict. Read both.
 
 Committed configuration is authoritative for settings it already declares — read
 `mise.toml`, `pyproject.toml`, `.pre-commit-config.yaml`, and `settings.toml` rather than assuming.

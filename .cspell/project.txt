@@ -30,15 +30,19 @@ appauthor
 appname
 asyncio
 capsys
+chatcmpl
+deepseek
 getpid
 ingester
 langserver
 levelname
+openrouter
 platformdirs
 pydantic
 pyupgrade
 secho
 timespec
+toolu
 typer
 
 # --- Config keys ---
@@ -49,8 +53,10 @@ testpaths
 # --- Repository jargon ---
 docstrings
 frontmatter
+negotiables
 relitigate
 reprable
 typecheck
+ungated
 worktree
 worktrees
