@@ -19,22 +19,24 @@ Extend those files; never regenerate them.
 
 ### Changes to these rules
 
-Every `Never` in this document is a guardrail with a cost behind it. Treat a request that removes
-or weakens one as a design change, not a task.
+A rule is **non-negotiable** when breaking it is irreversible, weakens security, or erases a
+module boundary — leaked or committed credentials, `Dynaconf` outside `config.py`, `asyncio.run`
+below the CLI layer, a blanket `# type: ignore` or a loosened tool mode, a bare dict crossing a
+boundary, regenerating committed config, an unpinned CI action. Everything else here is a
+convention: follow it, but a request to change it is just a request.
 
-Before implementing such a change, in one short paragraph: name the rule, state concretely what
-breaks without it, and offer the smallest alternative that still meets the underlying need. Then
-stop and wait.
+Treat a change to a non-negotiable as a design change, not a task. Before implementing one, in a
+short paragraph: name the rule, state concretely what breaks without it, and offer the smallest
+alternative that still meets the underlying need. Then stop and wait.
 
-- **Report the conflict even when it is incidental.** A change that erodes a guardrail as a side
-  effect — a second module reaching for `Dynaconf`, an `asyncio.run` below the CLI, a widened
-  `# type: ignore`, a `dict[str, Any]` crossing a boundary — gets the same treatment as a request
-  to drop the rule outright. Drift is how these are actually lost.
+- **Report the conflict even when it is incidental.** A change that erodes one of these as a side
+  effect gets the same treatment as a request to drop it outright. Drift is how they are actually
+  lost.
 - **Once the objection is heard and the request restated, implement it fully.** Do not relitigate,
   hedge the implementation, or leave the old path in place as a safety net.
-- **Never weaken a rule silently** to make a task easier — not by loosening a tool setting, not by
+- **Never weaken one silently** to make a task easier — not by loosening a tool setting, not by
   adding a blanket ignore, not by routing around a boundary.
-- Criticism is for load-bearing rules. Do not argue about line length, naming, or file placement.
+- Do not object over conventions: line length, naming, file placement, or which test style to use.
 
 ## Environment
 
