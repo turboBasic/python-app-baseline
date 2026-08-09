@@ -1,7 +1,9 @@
+from pathlib import Path
+
 import pytest
 from pydantic import SecretStr, ValidationError
 
-from app.config import Settings, load_settings
+from python_app_baseline.config import ENV_PREFIX, Settings, load_settings
 
 
 def test_loads_defaults_from_settings_file() -> None:
@@ -9,12 +11,12 @@ def test_loads_defaults_from_settings_file() -> None:
 
 
 def test_env_switcher_selects_environment(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv(f"{ENV_PREFIX}_ENV", "production")
     assert load_settings().log_level == "WARNING"
 
 
 def test_envvar_overrides_file_value(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("APP_LOG_LEVEL", "DEBUG")
+    monkeypatch.setenv(f"{ENV_PREFIX}_LOG_LEVEL", "DEBUG")
     assert load_settings().log_level == "DEBUG"
 
 
@@ -38,3 +40,27 @@ def test_secret_is_not_reprable() -> None:
     assert "sk-test-abc" not in repr(settings)
     assert settings.api_key is not None
     assert settings.api_key.get_secret_value() == "sk-test-abc"
+
+
+def test_log_level_argument_overrides_file_and_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(f"{ENV_PREFIX}_LOG_LEVEL", "DEBUG")
+    assert load_settings(log_level="ERROR").log_level == "ERROR"
+
+
+def test_invalid_log_level_is_rejected() -> None:
+    with pytest.raises(ValidationError):
+        Settings.model_validate({"log_level": "NOPE"})
+
+
+def test_log_file_defaults_to_none_meaning_the_platform_location() -> None:
+    assert load_settings().log_file is None
+
+
+def test_log_file_envvar_is_coerced_to_a_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(f"{ENV_PREFIX}_LOG_FILE", "/tmp/from-env.log")
+    assert load_settings().log_file == Path("/tmp/from-env.log")
+
+
+def test_log_file_argument_overrides_file_and_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(f"{ENV_PREFIX}_LOG_FILE", "/tmp/from-env.log")
+    assert load_settings(log_file=Path("from-arg.log")).log_file == Path("from-arg.log")
