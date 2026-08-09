@@ -97,44 +97,12 @@ and outputs. No bare dicts for long-lived data.
 
 ## Configuration
 
-`dynaconf` loads layered settings; a frozen Pydantic model is the only surface the rest of the
-codebase sees. A bare `Dynaconf` object types as `Any` under pyright strict.
+`src/app/config.py` owns settings loading; extend `Settings` and `settings.toml` there.
 
-```python
-from typing import Any, cast
-
-from dynaconf import Dynaconf
-from pydantic import BaseModel, ConfigDict
-
-_raw = Dynaconf(
-    settings_files=["settings.toml"],
-    environments=True,
-    envvar_prefix="APP",
-    env_switcher="APP_ENV",
-)
-
-
-class Settings(BaseModel):
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    example_field: str
-
-
-def load_settings() -> Settings:
-    raw = cast(dict[str, Any], _raw.as_dict())
-    lowered = {k.lower(): v for k, v in raw.items()}
-    return Settings.model_validate(
-        {name: lowered[name] for name in Settings.model_fields if name in lowered}
-    )
-```
-
-- Never import a `Dynaconf` instance outside this module. Application code imports `Settings` and
-  `load_settings`. The `cast` above is the only sanctioned one.
-- Select fields by declared name. Never pass `as_dict()` straight to `model_validate` —
-  dynaconf's injected `ENV` key trips `extra="forbid"`.
-- Set `env_switcher` explicitly. `envvar_prefix` does not rename it.
-- Validate at startup, at the entry point.
-- Keep the model `frozen=True` and `extra="forbid"`.
+- Never construct a `Dynaconf` instance outside that module. Everything else imports `Settings`
+  and `load_settings`.
+- Add non-secret defaults to `settings.toml`, secrets as `APP_`-prefixed environment variables.
+- Call `load_settings()` once at startup, at the entry point.
 
 ## Secrets
 
@@ -144,8 +112,7 @@ Secrets are read from the environment, injected at process start — never from 
 - Real `.env` files are git-ignored.
 - Reach secrets via `op run --env-file=.env.template -- <command>`, exposed as a mise task.
 - Never write a literal credential anywhere, tests included. Use `sk-test-…`-style fakes.
-- Secret fields on `Settings` are `SecretStr`, never entries in a settings file. Never log a
-  resolved secret.
+- Secret fields are `SecretStr`, never entries in a settings file. Never log a resolved secret.
 
 ## Logging
 

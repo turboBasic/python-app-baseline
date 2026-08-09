@@ -1,3 +1,8 @@
+# Non-secret configuration. Secrets arrive as APP_-prefixed environment variables.
+# Select an environment with APP_ENV=production.
+
 [default]
+log_level = "INFO"
 
 [production]
+log_level = "WARNING"
