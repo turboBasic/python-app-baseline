@@ -5,12 +5,13 @@ import uuid
 from datetime import UTC, datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, override
+from typing import Any, Literal, override
 
 from platformdirs import user_log_dir
 
 from python_app_baseline import APP_NAME
-from python_app_baseline.config import LogLevel
+
+LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 _LOG_FILE_NAME = f"{APP_NAME}.log"
 _MAX_BYTES = 5 * 1024 * 1024

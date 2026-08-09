@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, cast
 
 # dynaconf ships py.typed but no stubs pyright accepts; this module is the boundary that
 # contains the resulting Any.
@@ -7,8 +7,7 @@ from dynaconf import Dynaconf  # pyright: ignore[reportMissingTypeStubs]
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from python_app_baseline import APP_NAME
-
-LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+from python_app_baseline.logging import LogLevel
 
 ENV_PREFIX = APP_NAME.upper()
 
