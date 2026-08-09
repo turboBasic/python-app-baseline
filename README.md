@@ -1,5 +1,7 @@
 # python-app-baseline
 
+[![CI](https://github.com/turboBasic/python-app-baseline/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/turboBasic/python-app-baseline/actions/workflows/ci.yml?query=branch%3Amain)
+
 Baseline conventions for Python applications: mise tasks, ruff, pyright strict, pytest, and CI.
 Kept current rather than pinned to a point in time.
 
