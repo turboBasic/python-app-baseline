@@ -23,6 +23,11 @@ repos:
     hooks:
       - id: actionlint-system
 
+  - repo: https://github.com/streetsidesoftware/cspell-cli
+    rev: v10.0.1
+    hooks:
+      - id: cspell
+
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.17.0
     hooks:
