@@ -9,10 +9,10 @@ from typing import Any, override
 
 from platformdirs import user_log_dir
 
+from app import APP_NAME
 from app.config import LogLevel
 
-_LOGGER_NAME = "app"
-_LOG_FILE_NAME = "app.log"
+_LOG_FILE_NAME = f"{APP_NAME}.log"
 _MAX_BYTES = 5 * 1024 * 1024
 _BACKUP_COUNT = 3
 
@@ -71,8 +71,8 @@ class _JSONFormatter(logging.Formatter):
 def _build_file_handler(log_file: Path) -> logging.Handler | None:
     try:
         log_file.parent.mkdir(parents=True, exist_ok=True)
-        # delay=True keeps an invocation that never logs, such as `app --version`, from
-        # creating the file.
+        # delay=True keeps an invocation that never logs, such as `--version`, from creating
+        # the file.
         handler = RotatingFileHandler(
             log_file, maxBytes=_MAX_BYTES, backupCount=_BACKUP_COUNT, delay=True
         )
@@ -95,11 +95,11 @@ def _reset(logger: logging.Logger) -> None:
 
 
 def default_log_file() -> Path:
-    return Path(user_log_dir(_LOGGER_NAME)) / _LOG_FILE_NAME
+    return Path(user_log_dir(APP_NAME)) / _LOG_FILE_NAME
 
 
 def configure_logging(log_level: LogLevel, log_file: Path | None = None) -> Path:
-    # expanduser so a shell-quoted "~/app.log" still lands in the home directory; resolve so a
+    # expanduser so a shell-quoted "~/run.log" still lands in the home directory; resolve so a
     # relative path is anchored to the working directory once, and the returned path stays
     # meaningful to whoever reads it later.
     log_file = default_log_file() if log_file is None else log_file.expanduser().resolve()
@@ -121,7 +121,7 @@ def configure_logging(log_level: LogLevel, log_file: Path | None = None) -> Path
     # dependency's do not. Propagation consults the originating logger's level, not root's.
     root.setLevel(logging.INFO)
 
-    package_logger = logging.getLogger(_LOGGER_NAME)
+    package_logger = logging.getLogger(APP_NAME)
     _reset(package_logger)
     package_logger.setLevel(logging.DEBUG)
     package_logger.propagate = True

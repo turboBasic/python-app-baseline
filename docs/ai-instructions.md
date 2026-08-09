@@ -59,7 +59,8 @@ CLI is pinned in `mise.toml`. A task needing secrets wraps its command in
 - Run `uv lock` after editing dependencies and commit the result in the same change.
 - Before adding a dependency, check whether one already in the tree covers the need.
 - Renaming the package changes `[project].name`, `[project.scripts]`, `known-first-party`, and the
-  wheel `packages` entry together.
+  wheel `packages` entry together, plus the `from app …` import lines. Nothing else in `src/` or
+  `tests/`: see **Application identity** below.
 - Introducing a new file type or framework updates `.editorconfig`, `.gitattributes`, and
   `.gitignore` in the same change.
 
@@ -75,6 +76,28 @@ Python 3.14. No compatibility shims or version guards for earlier releases.
 - Full type hints on every signature, tests included.
 - No blocking I/O in an async path; wrap unavoidable blocking calls in `asyncio.to_thread`.
 
+### Application identity
+
+`APP_NAME` in `src/app/__init__.py` is the package's own import name, and it is the single source
+for every place the application names itself. Never write the name as a literal in `src/` or
+`tests/` — derive it:
+
+| Need | Source |
+| --- | --- |
+| Version from installed metadata | `version(APP_NAME)` |
+| Logger namespace | `logging.getLogger(APP_NAME)` |
+| Log file and platform log directory | `f"{APP_NAME}.log"`, `user_log_dir(APP_NAME)` |
+| Environment variable prefix | `ENV_PREFIX` from `app.config` |
+| CLI version banner | `_BANNER` in `src/app/cli.py` |
+
+`ENV_PREFIX` lives in `config.py` because environment variable naming is that module's boundary.
+Build and tooling files — `pyproject.toml`, `mise.toml`, `settings.toml`, `.env.template` — are read
+before Python runs and necessarily spell the name out.
+
+This assumes the distribution name matches the import name. Keep it that way: on a mismatch
+`version()` raises `PackageNotFoundError` and `__version__` silently degrades to `0+unknown`, which
+`test_version_is_resolved_from_installed_metadata` exists to catch.
+
 ### Module boundaries
 
 - **CLI** — Typer for commands, Rich for rendering. The CLI is a thin shell: it parses arguments,
@@ -88,10 +111,10 @@ Python 3.14. No compatibility shims or version guards for earlier releases.
   rows, tool inputs and outputs. No bare dicts for long-lived data.
 - **Configuration** — `src/app/config.py` owns settings loading. Never construct a `Dynaconf`
   instance outside it; everything else imports `Settings` and `load_settings`. Non-secret defaults
-  go in `settings.toml`, secrets in `APP_`-prefixed environment variables. Call `load_settings()`
-  once, at the entry point.
+  go in `settings.toml`, secrets in `ENV_PREFIX`-prefixed environment variables. Call
+  `load_settings()` once, at the entry point.
 - **Logging** — structured JSON to stderr, one object per line. Rich owns stdout. Namespace loggers
-  under the package name; configure once at the entry point, never at import time. No `print()` for
+  under `APP_NAME`; configure once at the entry point, never at import time. No `print()` for
   diagnostics.
 
 ### Secrets

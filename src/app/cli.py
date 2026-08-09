@@ -4,17 +4,19 @@ from typing import Annotated
 
 import typer
 
-from app import __version__
+from app import APP_NAME, __version__
 from app.config import LogLevel, load_settings
 from app.logging import configure_logging
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 
+_BANNER = f"{APP_NAME} {__version__}"
+
 
 @app.command()
 def version() -> None:
     """Show the version."""
-    typer.echo(f"app {__version__}")
+    typer.echo(_BANNER)
 
 
 @app.callback(invoke_without_command=True)
@@ -40,13 +42,13 @@ def main(
     resolved_log_file = configure_logging(settings.log_level, settings.log_file)
     # "configured_level", not "log_level": `level` is already this record's own severity, and the
     # two are indistinguishable under --log-level DEBUG.
-    logging.getLogger("app").debug(
+    logging.getLogger(APP_NAME).debug(
         "settings loaded",
         extra={"configured_level": settings.log_level, "log_file": resolved_log_file},
     )
 
     if version_flag:
-        typer.echo(f"app {__version__}")
+        typer.echo(_BANNER)
         raise typer.Exit()
 
     if ctx.invoked_subcommand is None:

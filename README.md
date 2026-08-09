@@ -9,9 +9,11 @@ exist to prove those rules hold — a Typer CLI and a Dynaconf loader with nothi
 
 ## Instantiating
 
-`app` is a deliberate placeholder. Renaming it touches `[project].name`, `[project.scripts]`,
-`known-first-party`, and the wheel `packages` entry together, plus the `APP_` environment prefix
-in `src/app/config.py` and `settings.toml`.
+`app` is a deliberate placeholder. Renaming it means moving `src/app/`, rewriting the `from app …`
+import lines, and updating `[project].name`, `[project.scripts]`, `known-first-party`, and the wheel
+`packages` entry together. Nothing beyond the imports: `APP_NAME` in `src/app/__init__.py` is the
+package's own import name, and the logger namespace, log file, log directory, `APP_` environment
+prefix (`ENV_PREFIX` in `src/app/config.py`), and version banner all derive from it.
 
 ## License
 

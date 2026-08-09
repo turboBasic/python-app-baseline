@@ -6,7 +6,11 @@ from typing import Any, Literal, cast
 from dynaconf import Dynaconf  # pyright: ignore[reportMissingTypeStubs]
 from pydantic import BaseModel, ConfigDict, SecretStr
 
+from app import APP_NAME
+
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+
+ENV_PREFIX = APP_NAME.upper()
 
 
 class Settings(BaseModel):
@@ -26,9 +30,9 @@ def load_settings(log_level: LogLevel | None = None, log_file: Path | None = Non
         Dynaconf(
             settings_files=["settings.toml"],
             environments=True,
-            envvar_prefix="APP",
+            envvar_prefix=ENV_PREFIX,
             # envvar_prefix does not rename the switcher; without this it stays ENV_FOR_DYNACONF.
-            env_switcher="APP_ENV",
+            env_switcher=f"{ENV_PREFIX}_ENV",
         ).as_dict(),
     )
     lowered = {key.lower(): value for key, value in raw.items()}
