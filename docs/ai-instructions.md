@@ -120,6 +120,8 @@ Secrets are read from the environment, injected at process start — never from 
 - ruff for lint and format. Never add black, isort, flake8, or pylint.
 - When pre-commit reformats files, re-stage and re-run.
 - Fix lint errors as they appear.
+- cspell checks every tracked file. A legitimate term it flags goes in `.cspell/project.txt`, in
+  the section it belongs to — never an inline ignore.
 
 ### Type checking
 
@@ -143,7 +145,7 @@ are acceptable only at a library boundary, with the reason stated.
 
 ### Git
 
-- Conventional Commits.
+- Conventional Commits, commitizen's default types. The PR title is held to the same format.
 - Commit or push only when asked. Branch first if on the default branch.
 - Never commit a secret or a generated cache directory.
 
