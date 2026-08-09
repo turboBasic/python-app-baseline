@@ -5,6 +5,8 @@ This repo is a conventions baseline. The deliverable is
 rules hold. Forking it to suit your own conventions is an expected use — the
 [MIT licence](LICENSE) asks nothing beyond keeping the notice.
 
+Taking part means following the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Read this first
 
 [`docs/ai-instructions.md`](docs/ai-instructions.md) is the single source of truth and binds humans
