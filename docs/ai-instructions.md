@@ -111,6 +111,11 @@ Secrets are read from the environment, injected at process start — never from 
 - No multi-line comment blocks.
 - Match surrounding comment density, naming, and idiom.
 - Update the single source of truth and link to it rather than creating parallel docs.
+- `README.md` and `CONTRIBUTING.md` are the human layer — what the repo is, how to set it up, how
+  to send a change. They link into this document instead of repeating it.
+- Every change ends by checking the documentation it affects — this document, the human layer, and
+  any doc naming a file, task, or convention that moved — and correcting it in the same change.
+  Stale framing is a defect, not a follow-up.
 
 ## Quality gates
 
