@@ -31,7 +31,13 @@ Never `pip install`. Never activate a venv by hand.
 - `requires-python = ">=3.14"`.
 - `src/<package>/` layout with `__init__.py`. Never a flat top-level package.
 - Runtime deps in `[project].dependencies`, dev deps in `[dependency-groups].dev`.
-- `uv sync --locked` in setup and CI.
+- `uv sync --locked` in setup and CI. Run `uv lock` after editing dependencies and commit the
+  result in the same change.
+
+`pyproject.toml`, `mise.toml`, and `.pre-commit-config.yaml` are committed and already satisfy
+every tool rule below. Extend them; do not regenerate them. `[project].name`, `[project.scripts]`,
+`known-first-party`, and the wheel `packages` entry all carry the placeholder package name `app`
+and are renamed together.
 
 Introducing a new file type or framework updates `.editorconfig`, `.gitattributes`, and
 `.gitignore` in the same change.
