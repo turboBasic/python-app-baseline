@@ -86,6 +86,9 @@ arguments, builds dependencies, and delegates. No business logic in a command fu
   or `typer.Option(...)` as a parameter default.
 - Command docstrings are the `--help` text.
 - `no_args_is_help=True` on the `Typer()` app.
+- Both `--version` and a `version` command, printing the same string. `__version__` comes from
+  `importlib.metadata.version()`, never a hardcoded literal. `--version` uses an eager callback
+  and does not offer a `-V` alias.
 - Rich writes to stdout, logging to stderr.
 - An `async` implementation is invoked from a sync command via a single `asyncio.run` at that
   boundary. Never call `asyncio.run` below the CLI layer.
