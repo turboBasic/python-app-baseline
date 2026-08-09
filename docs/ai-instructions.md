@@ -17,6 +17,25 @@ Extend those files; never regenerate them.
 - Match existing patterns over personal preference.
 - Scope to the request. No refactoring adjacent code or improving what was not asked about.
 
+### Changes to these rules
+
+Every `Never` in this document is a guardrail with a cost behind it. Treat a request that removes
+or weakens one as a design change, not a task.
+
+Before implementing such a change, in one short paragraph: name the rule, state concretely what
+breaks without it, and offer the smallest alternative that still meets the underlying need. Then
+stop and wait.
+
+- **Report the conflict even when it is incidental.** A change that erodes a guardrail as a side
+  effect — a second module reaching for `Dynaconf`, an `asyncio.run` below the CLI, a widened
+  `# type: ignore`, a `dict[str, Any]` crossing a boundary — gets the same treatment as a request
+  to drop the rule outright. Drift is how these are actually lost.
+- **Once the objection is heard and the request restated, implement it fully.** Do not relitigate,
+  hedge the implementation, or leave the old path in place as a safety net.
+- **Never weaken a rule silently** to make a task easier — not by loosening a tool setting, not by
+  adding a blanket ignore, not by routing around a boundary.
+- Criticism is for load-bearing rules. Do not argue about line length, naming, or file placement.
+
 ## Environment
 
 ### Tooling hierarchy
