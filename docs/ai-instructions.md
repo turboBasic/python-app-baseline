@@ -49,6 +49,7 @@ globally.
 ├── mise.toml                  # tool versions + dev tasks
 ├── pyproject.toml             # deps + ruff/pyright/pytest config
 ├── uv.lock
+├── settings.toml              # layered non-secret config ([default], per-environment)
 ├── .env.template              # op:// secret references only
 ├── .editorconfig              # mandatory
 ├── .gitattributes             # LF normalization + binary types
@@ -123,30 +124,73 @@ per-line ignores with a stated reason are acceptable at a library boundary; nowh
 persisted rows, tool inputs and outputs — is a Pydantic model. Avoid bare dicts for anything
 long-lived; a `dict[str, Any]` is a typing dead end.
 
-**Configuration: state the choice explicitly in the project's own docs.** Two viable options,
-with a real trade-off under pyright strict:
+**Configuration: `dynaconf` for loading, Pydantic for the typed surface.** Dynaconf handles
+layered settings files and per-environment overrides; a Pydantic model gives the rest of the
+codebase a checked, frozen view of the result.
 
-| | `pydantic-settings` | `dynaconf` |
-|---|---|---|
-| Static typing | Fields are declared and typed; pyright checks every access | `Dynaconf` has no `py.typed`; **every attribute access types as `Any`** |
-| Validation | At startup, from the model | Manual, or none |
-| Layered files / envs | Basic | Strong (multi-file, per-environment, merging) |
-| Secrets | `SecretStr` prevents accidental logging | Plain values |
+This split is required, not stylistic. `dynaconf` ships **no top-level `py.typed`**, so a bare
+`Dynaconf` object types as `Any` under pyright strict — and `Any` reports **0 errors**, meaning a
+mistyped settings key is silently unchecked wherever settings are read. Wrapping it restores full
+checking; both halves of that were verified with pyright strict (see the note below).
 
-**Default to `pydantic-settings`** in a pyright-strict project: settings are read everywhere, so
-`Any`-typed settings access erases type checking across the whole codebase. Verified with pyright
-strict — `settings.some_key` on a `Dynaconf` instance reveals as `Any` and raises no error, so
-a typo in a settings key is silently unchecked.
+**The required shape.** One module owns the loader; nothing else imports the `Dynaconf` object.
 
-**If `dynaconf` is chosen** for its layered-environment features, contain the damage:
+```python
+from typing import Any, cast
 
-- Instantiate it in exactly one module and never import the `Dynaconf` object elsewhere.
-- In that module, expose a frozen, fully annotated Pydantic model built from it, and validate at
-  startup. Application code imports only that model.
-- That module is the only place `Any` from `dynaconf` is permitted.
+from dynaconf import Dynaconf
+from pydantic import BaseModel, ConfigDict
 
-Either way, environment variables get a project-specific prefix, and secrets are never read from
-a committed file.
+_raw = Dynaconf(
+    settings_files=["settings.toml"],
+    environments=True,
+    envvar_prefix="APP",
+    env_switcher="APP_ENV",
+)
+
+
+class Settings(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    model: str
+    max_tokens: int
+
+
+def load_settings() -> Settings:
+    raw = cast(dict[str, Any], _raw.as_dict())
+    lowered = {k.lower(): v for k, v in raw.items()}
+    return Settings.model_validate(
+        {name: lowered[name] for name in Settings.model_fields if name in lowered}
+    )
+```
+
+Rules that make this hold:
+
+- **Never import `_raw` (or any `Dynaconf` instance) outside this module.** Application code
+  imports `Settings` and `load_settings` only. This module is the sole place `Any` from `dynaconf`
+  is permitted, and the `cast` above is the only sanctioned one.
+- **Select fields by declared name**, as above — do not hand `as_dict()` straight to
+  `model_validate`. Dynaconf injects bookkeeping keys (e.g. `ENV`) that `extra="forbid"` rejects,
+  so the naive version raises `extra_forbidden` the moment an environment is active.
+- **`env_switcher` must be set explicitly** if you want a prefixed switch variable. `envvar_prefix`
+  does *not* rename the switcher: without `env_switcher`, the environment is chosen by
+  `ENV_FOR_DYNACONF` and a prefixed variable is silently ignored — layering appears broken while
+  every value is quietly the default.
+- **Validate at startup**, at the entry point, so a bad settings file fails immediately rather
+  than at first access.
+- Keep the model `frozen=True` and `extra="forbid"`.
+
+Verified under `typeCheckingMode = "strict"`: `settings.model` resolves to `str` and
+`settings.max_tokens` to `int`; a typo (`settings.modl`) fails with `reportAttributeAccessIssue`
+*and* `reportUnknownMemberType`, and a wrong-type assignment fails with `reportAssignmentType`.
+Layering was confirmed end to end — file default, per-environment override via `APP_ENV`, and a
+single-value override via `APP_<FIELD>`.
+
+Environment variables always get a project-specific prefix. Secrets are never read from a
+committed settings file — see Secrets below.
+
+`pydantic-settings` remains a reasonable choice for a project with no layered-environment
+requirement; it collapses the two halves above into one class. Do not mix the two in one project.
 
 ## Secrets
 
@@ -158,8 +202,9 @@ a committed file.
   a mise task.
 - Never write a literal credential anywhere, including tests and examples. Use obviously fake
   values such as `sk-test-…`.
-- Wrap secret-valued settings in a type that resists accidental logging (e.g. `SecretStr`), and
-  never log a resolved secret.
+- Declare secret-valued fields on the `Settings` model as `SecretStr`, so they resist accidental
+  logging, and never log a resolved secret. Secrets arrive as environment variables, so they land
+  in the model through the same loader as everything else — never as an entry in a settings file.
 
 ## Logging
 
