@@ -3,13 +3,13 @@
 ## What this repo is
 
 A conventions baseline that people copy. It ships no service, is published to no package index, and
-`src/app/` is a Typer CLI and a settings loader with no logic beyond proving the rules hold. So the
-realistic risk is not a vulnerability in this code — it is a weak default propagating into every
-repo forked from it.
+`src/python_app_baseline/` is a Typer CLI and a settings loader with no logic beyond proving the
+rules hold. So the realistic risk is not a vulnerability in this code — it is a weak default
+propagating into every repo forked from it.
 
 Both are in scope:
 
-- A flaw in `src/app/`.
+- A flaw in `src/python_app_baseline/`.
 - A convention in [`docs/ai-instructions.md`](docs/ai-instructions.md) that leads a contributor
   somewhere unsafe — a rule that invites credential leakage, a quality gate weak enough to wave
   something through, a dependency or pinned action that should not be trusted.

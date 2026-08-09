@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from pydantic import SecretStr, ValidationError
 
-from app.config import ENV_PREFIX, Settings, load_settings
+from python_app_baseline.config import ENV_PREFIX, Settings, load_settings
 
 
 def test_loads_defaults_from_settings_file() -> None:

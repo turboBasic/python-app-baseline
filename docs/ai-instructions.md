@@ -59,8 +59,8 @@ CLI is pinned in `mise.toml`. A task needing secrets wraps its command in
 - Run `uv lock` after editing dependencies and commit the result in the same change.
 - Before adding a dependency, check whether one already in the tree covers the need.
 - Renaming the package changes `[project].name`, `[project.scripts]`, `known-first-party`, and the
-  wheel `packages` entry together, plus the `from app …` import lines. Nothing else in `src/` or
-  `tests/`: see **Application identity** below.
+  wheel `packages` entry together, plus the `from python_app_baseline …` import lines. Nothing else
+  in `src/` or `tests/`: see **Application identity** below.
 - Introducing a new file type or framework updates `.editorconfig`, `.gitattributes`, and
   `.gitignore` in the same change.
 
@@ -78,40 +78,49 @@ Python 3.14. No compatibility shims or version guards for earlier releases.
 
 ### Application identity
 
-`APP_NAME` in `src/app/__init__.py` is the package's own import name, and it is the single source
-for every place the application names itself. Never write the name as a literal in `src/` or
-`tests/` — derive it:
+`APP_NAME` in `src/python_app_baseline/__init__.py` is the package's own import name, and it is the
+single source for every place the application names itself. Never write the name as a literal in
+`src/` or `tests/` — derive it:
 
 | Need | Source |
 | --- | --- |
 | Version from installed metadata | `version(APP_NAME)` |
 | Logger namespace | `logging.getLogger(APP_NAME)` |
 | Log file and platform log directory | `f"{APP_NAME}.log"`, `user_log_dir(APP_NAME)` |
-| Environment variable prefix | `ENV_PREFIX` from `app.config` |
-| CLI version banner | `_BANNER` in `src/app/cli.py` |
+| Environment variable prefix | `ENV_PREFIX` from `python_app_baseline.config` |
+| CLI version banner | `_BANNER` in `src/python_app_baseline/cli.py` |
 
 `ENV_PREFIX` lives in `config.py` because environment variable naming is that module's boundary.
 Build and tooling files — `pyproject.toml`, `mise.toml`, `settings.toml`, `.env.template` — are read
 before Python runs and necessarily spell the name out.
 
-This assumes the distribution name matches the import name. Keep it that way: on a mismatch
-`version()` raises `PackageNotFoundError` and `__version__` silently degrades to `0+unknown`, which
+The package name is deliberately the full `python_app_baseline` rather than a short `app`. `app` is
+the conventional name for the Typer instance (`app = typer.Typer()`, `python_app_baseline.cli:app`),
+and a package by the same name makes `from app.cli import app` read as though a thing imports
+itself. A distinct package name also keeps `APP_NAME` — the constant, whose own name never changes —
+visibly separate from the value it holds, which changes with every application built from this
+baseline.
+
+This assumes the distribution name matches the import name after PEP 503 normalisation: dist
+`python-app-baseline`, import `python_app_baseline`. `importlib.metadata.version()` normalises, so
+hyphen-versus-underscore is not a mismatch. A genuine mismatch makes `version()` raise
+`PackageNotFoundError` and `__version__` silently degrade to `0+unknown`, which
 `test_version_is_resolved_from_installed_metadata` exists to catch.
 
 ### Module boundaries
 
 - **CLI** — Typer for commands, Rich for rendering. The CLI is a thin shell: it parses arguments,
-  builds dependencies, and delegates. No business logic in a command function. `src/app/cli.py` is
-  the reference for command shape.
+  builds dependencies, and delegates. No business logic in a command function.
+  `src/python_app_baseline/cli.py` is the reference for command shape.
   - **Always use the `Annotated` style** for arguments and options. Never pass
     `typer.Argument(...)` or `typer.Option(...)` as a parameter default.
   - An `async` implementation is invoked from a sync command via a single `asyncio.run` at that
     boundary. Never call `asyncio.run` below the CLI layer.
 - **Data models** — Pydantic v2 for anything crossing a boundary: external API responses, persisted
   rows, tool inputs and outputs. No bare dicts for long-lived data.
-- **Configuration** — `src/app/config.py` owns settings loading. Never construct a `Dynaconf`
-  instance outside it; everything else imports `Settings` and `load_settings`. Non-secret defaults
-  go in `settings.toml`, secrets in `ENV_PREFIX`-prefixed environment variables. Call
+- **Configuration** — `src/python_app_baseline/config.py` owns settings loading. Never construct a
+  `Dynaconf` instance outside it; everything else imports `Settings` and `load_settings`. Non-secret
+  defaults go in `settings.toml`, secrets in `ENV_PREFIX`-prefixed environment variables. Call
   `load_settings()` once, at the entry point.
 - **Logging** — structured JSON to stderr, one object per line. Rich owns stdout. Namespace loggers
   under `APP_NAME`; configure once at the entry point, never at import time. No `print()` for

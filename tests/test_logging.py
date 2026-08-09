@@ -11,9 +11,9 @@ from typing import cast
 
 import pytest
 
-import app.logging as app_logging
-from app import APP_NAME
-from app.logging import configure_logging
+from python_app_baseline import APP_NAME
+from python_app_baseline import logging as app_logging
+from python_app_baseline.logging import configure_logging
 
 
 @pytest.fixture(autouse=True)

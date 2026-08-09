@@ -9,8 +9,8 @@ from typing import Any, override
 
 from platformdirs import user_log_dir
 
-from app import APP_NAME
-from app.config import LogLevel
+from python_app_baseline import APP_NAME
+from python_app_baseline.config import LogLevel
 
 _LOG_FILE_NAME = f"{APP_NAME}.log"
 _MAX_BYTES = 5 * 1024 * 1024

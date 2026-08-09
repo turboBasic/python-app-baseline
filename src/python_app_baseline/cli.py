@@ -4,9 +4,9 @@ from typing import Annotated
 
 import typer
 
-from app import APP_NAME, __version__
-from app.config import LogLevel, load_settings
-from app.logging import configure_logging
+from python_app_baseline import APP_NAME, __version__
+from python_app_baseline.config import LogLevel, load_settings
+from python_app_baseline.logging import configure_logging
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 

@@ -1,8 +1,8 @@
 # Contributing
 
 This repo is a conventions baseline. The deliverable is
-[`docs/ai-instructions.md`](docs/ai-instructions.md); `src/app/` and `tests/` exist to prove those
-rules hold. Forking it to suit your own conventions is an expected use — the
+[`docs/ai-instructions.md`](docs/ai-instructions.md); `src/python_app_baseline/` and `tests/` exist
+to prove those rules hold. Forking it to suit your own conventions is an expected use — the
 [MIT licence](LICENSE) asks nothing beyond keeping the notice.
 
 Taking part means following the [Code of Conduct](CODE_OF_CONDUCT.md). Report anything exploitable

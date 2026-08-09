@@ -6,7 +6,7 @@ from typing import Any, Literal, cast
 from dynaconf import Dynaconf  # pyright: ignore[reportMissingTypeStubs]
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from app import APP_NAME
+from python_app_baseline import APP_NAME
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 

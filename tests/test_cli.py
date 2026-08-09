@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from app import APP_NAME, __version__
-from app.cli import app
-from app.config import ENV_PREFIX
+from python_app_baseline import APP_NAME, __version__
+from python_app_baseline.cli import app
+from python_app_baseline.config import ENV_PREFIX
 
 runner = CliRunner()
 
@@ -25,7 +25,8 @@ def _isolated_log_file(  # pyright: ignore[reportUnusedFunction]
 
 def test_version_is_resolved_from_installed_metadata() -> None:
     # A distribution name that stops matching the import name would silently degrade to the
-    # fallback rather than fail; this turns that into a test failure.
+    # fallback rather than fail; this turns that into a test failure. Hyphen-versus-underscore is
+    # not a mismatch: version() normalises both sides.
     assert __version__ != "0+unknown"
 
 
