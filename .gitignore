@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# uv / venv
+.venv/
+.python-version
+
+# Tooling caches
+.mypy_cache/
+.pyright/
+.pytest_cache/
+.ruff_cache/
+.cache/
+
+# mise
+.mise/
+
+# App runtime data
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Secrets (op run reads .env.template with op:// references; real .env is never committed)
+.env
+.env.local
+
+# Editors / OS
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+.DS_Store
