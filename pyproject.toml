@@ -68,7 +68,69 @@ asyncio_mode = "auto"
 addopts = ["-ra"]
 
 [tool.commitizen]
-name = "cz_conventional_commits"
+name = "cz_customize"
 tag_format = "$version"
 version_scheme = "pep440"
 version_provider = "pep621"
+
+# Edit the allowed commit types here. The type list appears twice on purpose:
+# schema_pattern is what `cz check` and CI enforce, choices is what the `cz commit`
+# prompt offers. Keep them in sync.
+[tool.commitizen.customize]
+schema_pattern = '(?s)(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([\w./-]+\))?!?: ([^\n\r]+)((\n\n.*)|(\s*))?$'
+schema = "<type>(<scope>): <subject>"
+example = "feat(cli): add --version option"
+message_template = "{{prefix}}{% if scope %}({{scope}}){% endif %}: {{subject}}{% if body %}\n\n{{body}}{% endif %}"
+
+# Carried over from cz_conventional_commits, which cz_customize does not inherit.
+# Without these, `cz bump` stops deriving the version from commit types.
+bump_pattern = '^((BREAKING[\-\ ]CHANGE|\w+)(\(.+\))?!?):'
+
+[tool.commitizen.customize.bump_map]
+"^.+!$" = "MAJOR"
+"^BREAKING[\\-\\ ]CHANGE" = "MAJOR"
+"^feat" = "MINOR"
+"^fix" = "PATCH"
+"^refactor" = "PATCH"
+"^perf" = "PATCH"
+
+[tool.commitizen.customize.bump_map_major_version_zero]
+"^.+!$" = "MINOR"
+"^BREAKING[\\-\\ ]CHANGE" = "MINOR"
+"^feat" = "MINOR"
+"^fix" = "PATCH"
+"^refactor" = "PATCH"
+"^perf" = "PATCH"
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "prefix"
+message = "Type of change:"
+choices = [
+  { value = "feat", name = "feat: a new feature" },
+  { value = "fix", name = "fix: a bug fix" },
+  { value = "docs", name = "docs: documentation only" },
+  { value = "style", name = "style: formatting, no behaviour change" },
+  { value = "refactor", name = "refactor: neither fixes a bug nor adds a feature" },
+  { value = "perf", name = "perf: improves performance" },
+  { value = "test", name = "test: adds or corrects tests" },
+  { value = "build", name = "build: build system or dependencies" },
+  { value = "ci", name = "ci: CI configuration and workflows" },
+  { value = "chore", name = "chore: general maintenance" },
+  { value = "revert", name = "revert: reverts an earlier commit" },
+]
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "scope"
+message = "Scope (optional, e.g. cli, config):"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "subject"
+message = "Subject, imperative mood, no trailing period:"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "body"
+message = "Body (optional, blank line is added for you):"
