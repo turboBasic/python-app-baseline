@@ -3,9 +3,8 @@
 Single source of truth for all AI coding tools (Claude Code, GitHub Copilot) working in this repo.
 `CLAUDE.md` and `.github/copilot-instructions.md` both point here.
 
-This file is application-independent: it covers the Python platform only and says nothing about
-what this project does. Application conventions live in a separate document that references this
-one.
+Scope: the Python platform. Application conventions live in a separate document that references
+this one.
 
 ## Tooling hierarchy
 
@@ -18,7 +17,7 @@ Never `pip install`. Never activate a venv by hand.
 
 ## mise
 
-`mise.toml` pins every runtime and CLI. Nothing is assumed installed globally.
+`mise.toml` pins every runtime and CLI. Nothing is installed globally.
 
 - Pin `python = "3.14"` and uv.
 - `[env]` sets `_.python.venv = { path = ".venv", create = true }`.
@@ -34,10 +33,9 @@ Never `pip install`. Never activate a venv by hand.
 - `uv sync --locked` in setup and CI. Run `uv lock` after editing dependencies and commit the
   result in the same change.
 
-`pyproject.toml`, `mise.toml`, and `.pre-commit-config.yaml` are committed and already satisfy
-every tool rule below. Extend them; do not regenerate them. `[project].name`, `[project.scripts]`,
-`known-first-party`, and the wheel `packages` entry all carry the placeholder package name `app`
-and are renamed together.
+Extend `pyproject.toml`, `mise.toml`, and `.pre-commit-config.yaml`; never regenerate them.
+Renaming the package changes `[project].name`, `[project.scripts]`, `known-first-party`, and the
+wheel `packages` entry together.
 
 Introducing a new file type or framework updates `.editorconfig`, `.gitattributes`, and
 `.gitignore` in the same change.
@@ -60,7 +58,7 @@ Pre-commit is the linting entry point. Never call `ruff` directly.
 - Configured in `pyproject.toml`, with `target-version = "py314"`.
 - Rules: `E`, `W`, `F`, `I`, `UP`, `B`, `SIM`, `C4`, `RUF`, plus `ASYNC` in async projects.
 - Set `known-first-party`.
-- Pre-commit reformatting files is expected: re-stage and re-run.
+- When pre-commit reformats files, re-stage and re-run.
 - Fix lint errors as they appear.
 
 `.pre-commit-config.yaml` runs ruff plus the hygiene hooks: `trailing-whitespace`,
@@ -69,12 +67,12 @@ Pre-commit is the linting entry point. Never call `ruff` directly.
 
 ## pyright
 
-`typeCheckingMode = "strict"` and `pythonVersion = "3.14"`, wired as a local pre-commit hook
-running `uv run pyright`. Set `venvPath = "."` and `venv = ".venv"`.
+`typeCheckingMode = "strict"` and `pythonVersion = "3.14"`, run as a local pre-commit hook via
+`uv run pyright`. Set `venvPath = "."` and `venv = ".venv"`.
 
-A dependency without a `py.typed` marker resolves to `Any`, and pyright reports **0 errors** on
-`Any` — unchecked code looks clean. When adding a dependency: check for `py.typed`, else add a
-`types-<name>` stubs package, else confine the library behind a small annotated adapter module.
+A dependency without a `py.typed` marker resolves to `Any`, which pyright accepts silently. When
+adding one: check for `py.typed`, else add a `types-<name>` stubs package, else confine the library
+behind a small annotated adapter module.
 
 Never use a blanket `# type: ignore` or loosen the mode to clear an error. Narrow per-line ignores
 are acceptable only at a library boundary.
@@ -84,11 +82,11 @@ are acceptable only at a library boundary.
 Typer for the CLI layer, Rich for terminal rendering. The CLI is a thin shell: it parses
 arguments, builds dependencies, and delegates. No business logic in a command function.
 
-- **Always use the `Annotated` style** for arguments and options. Passing `typer.Argument(...)` or
-  `typer.Option(...)` as a parameter default is the deprecated idiom.
-- Command docstrings are the `--help` text — the one place a docstring is written.
+- **Always use the `Annotated` style** for arguments and options. Never pass `typer.Argument(...)`
+  or `typer.Option(...)` as a parameter default.
+- Command docstrings are the `--help` text.
 - `no_args_is_help=True` on the `Typer()` app.
-- Rich writes to stdout; logging goes to stderr, so the two never interleave.
+- Rich writes to stdout, logging to stderr.
 - An `async` implementation is invoked from a sync command via a single `asyncio.run` at that
   boundary. Never call `asyncio.run` below the CLI layer.
 
@@ -116,8 +114,7 @@ and outputs. No bare dicts for long-lived data.
 ## Configuration
 
 `dynaconf` loads layered settings; a frozen Pydantic model is the only surface the rest of the
-codebase sees. A bare `Dynaconf` object types as `Any` under pyright strict, so the wrapper is
-required.
+codebase sees. A bare `Dynaconf` object types as `Any` under pyright strict.
 
 ```python
 from typing import Any, cast
@@ -149,10 +146,9 @@ def load_settings() -> Settings:
 
 - Never import a `Dynaconf` instance outside this module. Application code imports `Settings` and
   `load_settings`. The `cast` above is the only sanctioned one.
-- Select fields by declared name. Passing `as_dict()` straight to `model_validate` trips
-  `extra="forbid"` on dynaconf's injected `ENV` key.
-- Set `env_switcher` explicitly. `envvar_prefix` does not rename it, and without it a prefixed
-  switch variable is silently ignored.
+- Select fields by declared name. Never pass `as_dict()` straight to `model_validate` —
+  dynaconf's injected `ENV` key trips `extra="forbid"`.
+- Set `env_switcher` explicitly. `envvar_prefix` does not rename it.
 - Validate at startup, at the entry point.
 - Keep the model `frozen=True` and `extra="forbid"`.
 
@@ -169,7 +165,7 @@ Secrets are read from the environment, injected at process start — never from 
 
 ## Logging
 
-Structured JSON to stderr, one object per line, so it never collides with Rich output on stdout.
+Structured JSON to stderr, one object per line. Rich owns stdout.
 
 - Namespace loggers under the package name; `propagate = False` on the package root.
 - Configure once, at the entry point — never at import time.
