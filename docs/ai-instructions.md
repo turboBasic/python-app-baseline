@@ -31,31 +31,12 @@ Never `pip install`. Never activate a venv by hand.
 ## uv
 
 - `pyproject.toml` + `uv.lock`, both committed. No `setup.py`, `setup.cfg`, or `requirements.txt`.
+- `src/<package>/` layout with `__init__.py`. Never a flat top-level package.
 - Runtime deps in `[project].dependencies`, dev deps in `[dependency-groups].dev`.
 - `uv sync --locked` in setup and CI.
 
-## Layout
-
-```text
-.
-├── mise.toml
-├── pyproject.toml             # deps + ruff/pyright/pytest config
-├── uv.lock
-├── settings.toml              # layered non-secret config
-├── .env.template              # op:// references only
-├── .editorconfig
-├── .gitattributes
-├── .pre-commit-config.yaml
-├── CLAUDE.md
-├── .github/copilot-instructions.md
-├── docs/ai-instructions.md
-├── src/<package>/
-└── tests/                     # mirrors src/
-```
-
-Keep this tree current in the same change that adds or removes a top-level directory. Introducing
-a new file type or framework updates `.editorconfig`, `.gitattributes`, and `.gitignore` in that
-same change.
+Introducing a new file type or framework updates `.editorconfig`, `.gitattributes`, and
+`.gitignore` in the same change.
 
 ## Python
 
@@ -75,6 +56,10 @@ Pre-commit is the linting entry point. Never call `ruff` directly.
 - Set `known-first-party`.
 - Pre-commit reformatting files is expected: re-stage and re-run.
 - Fix lint errors as they appear.
+
+`.pre-commit-config.yaml` runs ruff plus the hygiene hooks: `trailing-whitespace`,
+`end-of-file-fixer`, `check-yaml`, `check-toml`, `check-added-large-files`,
+`check-merge-conflict`.
 
 ## pyright
 
