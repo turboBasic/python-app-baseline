@@ -29,6 +29,7 @@ dist/
 # Secrets (op run reads .env.template with op:// references; real .env is never committed)
 .env
 .env.local
+.secrets.toml
 
 # Editors / OS
 .vscode/*
