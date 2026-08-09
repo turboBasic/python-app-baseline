@@ -82,29 +82,13 @@ are acceptable only at a library boundary.
 Typer for the CLI layer, Rich for terminal rendering. The CLI is a thin shell: it parses
 arguments, builds dependencies, and delegates. No business logic in a command function.
 
+`src/app/cli.py` is the reference for command shape; follow it.
+
 - **Always use the `Annotated` style** for arguments and options. Never pass `typer.Argument(...)`
   or `typer.Option(...)` as a parameter default.
-- Command docstrings are the `--help` text.
-- `no_args_is_help=True` on the `Typer()` app.
 - Rich writes to stdout, logging to stderr.
 - An `async` implementation is invoked from a sync command via a single `asyncio.run` at that
   boundary. Never call `asyncio.run` below the CLI layer.
-
-```python
-from typing import Annotated
-
-import typer
-
-app = typer.Typer(no_args_is_help=True)
-
-
-@app.command()
-def run(
-    task: Annotated[str, typer.Argument(help="What to do")],
-    model: Annotated[str | None, typer.Option("--model")] = None,
-) -> None:
-    """Run a task."""
-```
 
 ## Data models
 
