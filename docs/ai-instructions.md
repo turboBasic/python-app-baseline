@@ -7,9 +7,6 @@ This file is application-independent: it covers the Python platform only and say
 what this project does. Application conventions live in a separate document that references this
 one.
 
-This file is self-contained. It does not defer to any user-level or global instruction file.
-A tool not named here is not available; a rule not stated here is not in force.
-
 ## Tooling hierarchy
 
 1. **Project task** — a `mise.toml` task (`lint`, `test`, `typecheck`, `fmt`). Never bypass it.
@@ -23,7 +20,7 @@ Never `pip install`. Never activate a venv by hand.
 
 `mise.toml` pins every runtime and CLI. Nothing is assumed installed globally.
 
-- Pin Python and uv.
+- Pin `python = "3.14"` and uv.
 - `[env]` sets `_.python.venv = { path = ".venv", create = true }`.
 - Tasks: `setup`, `fmt`, `lint`, `typecheck`, `test`, `ci` (`depends = ["lint", "typecheck", "test"]`).
 - Tasks needing secrets wrap their command in `op run --env-file=.env.template --`.
@@ -31,6 +28,7 @@ Never `pip install`. Never activate a venv by hand.
 ## uv
 
 - `pyproject.toml` + `uv.lock`, both committed. No `setup.py`, `setup.cfg`, or `requirements.txt`.
+- `requires-python = ">=3.14"`.
 - `src/<package>/` layout with `__init__.py`. Never a flat top-level package.
 - Runtime deps in `[project].dependencies`, dev deps in `[dependency-groups].dev`.
 - `uv sync --locked` in setup and CI.
@@ -39,6 +37,8 @@ Introducing a new file type or framework updates `.editorconfig`, `.gitattribute
 `.gitignore` in the same change.
 
 ## Python
+
+Python 3.14. No compatibility shims or version guards for earlier releases.
 
 - `X | None`, not `typing.Optional`. Built-in `dict`/`list`/`tuple`, not `typing.Dict`.
 - No `from __future__ import annotations`.
@@ -51,7 +51,7 @@ Introducing a new file type or framework updates `.editorconfig`, `.gitattribute
 Pre-commit is the linting entry point. Never call `ruff` directly.
 
 - ruff for lint and format. No black, isort, flake8, or pylint.
-- Configured in `pyproject.toml`.
+- Configured in `pyproject.toml`, with `target-version = "py314"`.
 - Rules: `E`, `W`, `F`, `I`, `UP`, `B`, `SIM`, `C4`, `RUF`, plus `ASYNC` in async projects.
 - Set `known-first-party`.
 - Pre-commit reformatting files is expected: re-stage and re-run.
@@ -63,8 +63,8 @@ Pre-commit is the linting entry point. Never call `ruff` directly.
 
 ## pyright
 
-`typeCheckingMode = "strict"`, wired as a local pre-commit hook running `uv run pyright`. Set
-`venvPath = "."` and `venv = ".venv"`.
+`typeCheckingMode = "strict"` and `pythonVersion = "3.14"`, wired as a local pre-commit hook
+running `uv run pyright`. Set `venvPath = "."` and `venv = ".venv"`.
 
 A dependency without a `py.typed` marker resolves to `Any`, and pyright reports **0 errors** on
 `Any` — unchecked code looks clean. When adding a dependency: check for `py.typed`, else add a
@@ -176,8 +176,6 @@ Structured JSON to stderr, one object per line, so it never collides with progra
 ## Behavior
 
 - Read the file, run the tool, check the config rather than guessing at structure or conventions.
+- Ask when genuinely ambiguous; take the sensible default otherwise and say so.
 - Match existing patterns over personal preference.
 - Scope to the request. No refactoring adjacent code or improving what was not asked about.
-- No abstraction justified only by a hypothetical future need, and no error handling for
-  conditions that cannot occur.
-- Ask when genuinely ambiguous; take the sensible default otherwise and say so.
