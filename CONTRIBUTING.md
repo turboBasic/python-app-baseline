@@ -37,3 +37,7 @@ mise run ci      # lint, typecheck, test — exactly what CI runs
 
 Branch first. Title the PR as a Conventional Commit — a squash merge takes its subject from there.
 Both workflows must pass.
+
+[The template](.github/PULL_REQUEST_TEMPLATE.md) asks why the change exists, what you verified
+beyond `mise run ci`, and which docs moved with it. Agent-written code is welcome; you are still
+the author of it.
