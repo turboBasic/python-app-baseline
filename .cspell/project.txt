@@ -1,0 +1,44 @@
+# Project vocabulary: repository names, tooling and library identifiers.
+# One word per line; case-insensitive unless the entry is capitalised.
+
+# --- Repository and tooling ---
+turboBasic
+actionlint
+chezmoi
+commitizen
+cspell
+dynaconf
+hatchling
+mise
+pyright
+pytest
+ruff
+shellcheck
+zinit
+
+# --- Publisher handles: GitHub actions and VS Code extensions ---
+amannn
+charliermarsh
+tamasfe
+
+# --- Library and API identifiers ---
+asyncio
+langserver
+levelname
+pydantic
+pyupgrade
+secho
+typer
+
+# --- Config keys ---
+addopts
+testpaths
+
+# --- Repository jargon ---
+docstrings
+frontmatter
+relitigate
+reprable
+typecheck
+worktree
+worktrees

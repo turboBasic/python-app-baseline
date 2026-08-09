@@ -23,5 +23,27 @@
     "**/.ruff_cache": true,
     "**/.mypy_cache": true
   },
-  "hide-files.files": []
+  "hide-files.files": [],
+  "cSpell.enabled": true,
+  "cSpell.diagnosticLevel": "Information",
+  "cSpell.enabledFileTypes": {
+    "markdown": true,
+    "python": true,
+    "toml": true,
+    "yaml": true,
+    "json": true,
+    "jsonc": true,
+    "shellscript": true,
+    "ini": true,
+    "plaintext": true
+  },
+  "cSpell.customDictionaries": {
+    "project": {
+      "name": "project",
+      "path": "${workspaceFolder}/.cspell/project.txt",
+      "description": "names, tooling and identifiers specific to this repository",
+      "addWords": true,
+      "scope": "workspace"
+    }
+  }
 }
