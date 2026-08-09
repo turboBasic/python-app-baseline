@@ -29,6 +29,7 @@ tamasfe
 appauthor
 appname
 asyncio
+byok
 capsys
 chatcmpl
 deepseek
