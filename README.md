@@ -1,6 +1,7 @@
 # python-app-baseline
 
-[![CI](https://github.com/turboBasic/python-app-baseline/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/turboBasic/python-app-baseline/actions/workflows/ci.yml?query=branch%3Amain)
+[![CI][ci-badge]][ci] [![Python 3.14+][python-badge]][python] [![Ruff][ruff-badge]][ruff]
+[![License: MIT][license-badge]][license]
 
 Baseline conventions for Python applications: mise tasks, ruff, pyright strict, pytest, and CI.
 Kept current rather than pinned to a point in time.
@@ -25,3 +26,14 @@ see [Application identity](docs/ai-instructions.md#application-identity).
 ## License
 
 [MIT](LICENSE). Fork it, copy from it, no attribution beyond the notice.
+
+<!-- Link references: badges at the top of this file. -->
+
+[ci]: https://github.com/turboBasic/python-app-baseline/actions/workflows/ci.yml?query=branch%3Amain
+[ci-badge]: https://github.com/turboBasic/python-app-baseline/actions/workflows/ci.yml/badge.svg?branch=main
+[license]: LICENSE
+[license-badge]: https://img.shields.io/github/license/turboBasic/python-app-baseline
+[python]: https://www.python.org/downloads/release/python-3140/
+[python-badge]: https://img.shields.io/badge/python-3.14%2B-blue.svg
+[ruff]: https://docs.astral.sh/ruff/
+[ruff-badge]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
