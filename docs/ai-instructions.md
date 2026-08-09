@@ -73,6 +73,35 @@ A dependency without a `py.typed` marker resolves to `Any`, and pyright reports 
 Never use a blanket `# type: ignore` or loosen the mode to clear an error. Narrow per-line ignores
 are acceptable only at a library boundary.
 
+## CLI
+
+Typer for the CLI layer, Rich for terminal rendering. The CLI is a thin shell: it parses
+arguments, builds dependencies, and delegates. No business logic in a command function.
+
+- **Always use the `Annotated` style** for arguments and options. Passing `typer.Argument(...)` or
+  `typer.Option(...)` as a parameter default is the deprecated idiom.
+- Command docstrings are the `--help` text — the one place a docstring is written.
+- `no_args_is_help=True` on the `Typer()` app.
+- Rich writes to stdout; logging goes to stderr, so the two never interleave.
+- An `async` implementation is invoked from a sync command via a single `asyncio.run` at that
+  boundary. Never call `asyncio.run` below the CLI layer.
+
+```python
+from typing import Annotated
+
+import typer
+
+app = typer.Typer(no_args_is_help=True)
+
+
+@app.command()
+def run(
+    task: Annotated[str, typer.Argument(help="What to do")],
+    model: Annotated[str | None, typer.Option("--model")] = None,
+) -> None:
+    """Run a task."""
+```
+
 ## Data models
 
 Pydantic v2 for anything crossing a boundary — external API responses, persisted rows, tool inputs
@@ -134,7 +163,7 @@ Secrets are read from the environment, injected at process start — never from 
 
 ## Logging
 
-Structured JSON to stderr, one object per line, so it never collides with program output.
+Structured JSON to stderr, one object per line, so it never collides with Rich output on stdout.
 
 - Namespace loggers under the package name; `propagate = False` on the package root.
 - Configure once, at the entry point — never at import time.
@@ -153,8 +182,8 @@ Structured JSON to stderr, one object per line, so it never collides with progra
 
 ## Comments and docs
 
-- No docstrings. The sole exception is a framework that renders one as user-facing text, such as a
-  CLI library producing `--help`.
+- No docstrings. The sole exception is a Typer command function, where the docstring is the
+  `--help` text.
 - Comments only where the WHY is non-obvious, never restating what the code does.
 - No multi-line comment blocks.
 - Match surrounding comment density, naming, and idiom.
