@@ -16,3 +16,7 @@ in `src/app/config.py` and `settings.toml`.
 mise run setup   # dependencies and pre-commit hooks
 mise run ci      # lint, typecheck, test — what CI runs
 ```
+
+## License
+
+[MIT](LICENSE). Fork it, copy from it, no attribution beyond the notice.
