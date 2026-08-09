@@ -22,9 +22,8 @@ Extend those files; never regenerate them.
 A rule is **non-negotiable** when breaking it is irreversible, weakens security, or erases a
 module boundary — leaked or committed credentials, `Dynaconf` outside `config.py`, `asyncio.run`
 below the CLI layer, a blanket `# type: ignore` or a loosened tool mode, a bare dict crossing a
-boundary, regenerating committed config, an unpinned CI action, anything that makes a test pass
-without running. Everything else here is a convention: follow it, but a request to change it is
-just a request.
+boundary, regenerating committed config, an unpinned CI action, `unittest.TestCase`. Everything
+else here is a convention: follow it, but a request to change it is just a request.
 
 Treat a change to a non-negotiable as a design change, not a task. Before implementing one, in a
 short paragraph: name the rule, state concretely what breaks without it, and offer the smallest
@@ -133,9 +132,7 @@ are acceptable only at a library boundary, with the reason stated.
 
 ### Testing
 
-- pytest. Never `unittest.TestCase` classes: they silently disable fixtures and
-  `parametrize`, and an `async def` method inside one is never awaited — it reports as passing
-  without running.
+- pytest. Never `unittest.TestCase` classes.
 - `tests/` mirrors `src/`, annotated like any other code.
 - Tests needing network or real credentials are marked, deselected by default, and given their own
   task. They never run in CI.
