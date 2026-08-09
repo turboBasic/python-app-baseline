@@ -1,5 +1,5 @@
-# Non-secret configuration. Secrets arrive as APP_-prefixed environment variables.
-# Select an environment with APP_ENV=production.
+# Non-secret configuration. Secrets arrive as PYTHON_APP_BASELINE_-prefixed environment variables.
+# Select an environment with PYTHON_APP_BASELINE_ENV=production.
 
 [default]
 log_level = "INFO"
