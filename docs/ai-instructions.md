@@ -10,7 +10,16 @@ Committed configuration is authoritative for settings it already declares — re
 `mise.toml`, `pyproject.toml`, `.pre-commit-config.yaml`, and `settings.toml` rather than assuming.
 Extend those files; never regenerate them.
 
-## Tooling hierarchy
+## Working style
+
+- Read the file, run the tool, check the config rather than guessing at structure or conventions.
+- Ask when genuinely ambiguous; take the sensible default otherwise and say so.
+- Match existing patterns over personal preference.
+- Scope to the request. No refactoring adjacent code or improving what was not asked about.
+
+## Environment
+
+### Tooling hierarchy
 
 1. **Project task** — a `mise.toml` task (`lint`, `test`, `typecheck`, `fmt`). Never bypass it.
 2. **Pre-commit** — `mise exec -- pre-commit run`.
@@ -21,7 +30,7 @@ Never `pip install`. Never activate a venv by hand. Nothing is installed globall
 CLI is pinned in `mise.toml`. A task needing secrets wraps its command in
 `op run --env-file=.env.template --`.
 
-## Dependencies
+### Dependencies
 
 - Runtime deps in `[project].dependencies`, dev deps in `[dependency-groups].dev`. No `setup.py`,
   `setup.cfg`, or `requirements.txt`.
@@ -32,7 +41,9 @@ CLI is pinned in `mise.toml`. A task needing secrets wraps its command in
 - Introducing a new file type or framework updates `.editorconfig`, `.gitattributes`, and
   `.gitignore` in the same change.
 
-## Python
+## Code
+
+### Python
 
 Python 3.14. No compatibility shims or version guards for earlier releases.
 
@@ -42,23 +53,7 @@ Python 3.14. No compatibility shims or version guards for earlier releases.
 - Full type hints on every signature, tests included.
 - No blocking I/O in an async path; wrap unavoidable blocking calls in `asyncio.to_thread`.
 
-## Linting
-
-- Pre-commit is the linting entry point. Never call `ruff` directly.
-- ruff for lint and format. Never add black, isort, flake8, or pylint.
-- When pre-commit reformats files, re-stage and re-run.
-- Fix lint errors as they appear.
-
-## Type checking
-
-pyright strict. A dependency without a `py.typed` marker resolves to `Any`, which pyright accepts
-silently. When adding one: check for `py.typed`, else add a `types-<name>` stubs package, else
-confine the library behind a small annotated adapter module.
-
-Never use a blanket `# type: ignore` or loosen the mode to clear an error. Narrow per-line ignores
-are acceptable only at a library boundary, with the reason stated.
-
-## Architecture
+### Architecture
 
 - **CLI** — Typer for commands, Rich for rendering. The CLI is a thin shell: it parses arguments,
   builds dependencies, and delegates. No business logic in a command function. `src/app/cli.py` is
@@ -77,7 +72,7 @@ are acceptable only at a library boundary, with the reason stated.
   under the package name; configure once at the entry point, never at import time. No `print()` for
   diagnostics.
 
-## Secrets
+### Secrets
 
 Secrets are read from the environment, injected at process start — never from a file.
 
@@ -86,16 +81,7 @@ Secrets are read from the environment, injected at process start — never from 
 - Never write a literal credential anywhere, tests included. Use `sk-test-…`-style fakes.
 - Secret fields are `SecretStr`, never entries in a settings file. Never log a resolved secret.
 
-## Testing
-
-- pytest. Never `unittest.TestCase` classes.
-- `tests/` mirrors `src/`, annotated like any other code.
-- Tests needing network or real credentials are marked, deselected by default, and given their own
-  task. They never run in CI.
-- Do not run the suite after every edit — run it when asked or when verifying a fix.
-- A test failing after a change is fixed before the work is reported done.
-
-## Comments and docs
+### Comments and docs
 
 - No docstrings. The sole exception is a Typer command function, where the docstring is the
   `--help` text.
@@ -104,22 +90,44 @@ Secrets are read from the environment, injected at process start — never from 
 - Match surrounding comment density, naming, and idiom.
 - Update the single source of truth and link to it rather than creating parallel docs.
 
-## Git
+## Quality gates
+
+### Linting
+
+- Pre-commit is the linting entry point. Never call `ruff` directly.
+- ruff for lint and format. Never add black, isort, flake8, or pylint.
+- When pre-commit reformats files, re-stage and re-run.
+- Fix lint errors as they appear.
+
+### Type checking
+
+pyright strict. A dependency without a `py.typed` marker resolves to `Any`, which pyright accepts
+silently. When adding one: check for `py.typed`, else add a `types-<name>` stubs package, else
+confine the library behind a small annotated adapter module.
+
+Never use a blanket `# type: ignore` or loosen the mode to clear an error. Narrow per-line ignores
+are acceptable only at a library boundary, with the reason stated.
+
+### Testing
+
+- pytest. Never `unittest.TestCase` classes.
+- `tests/` mirrors `src/`, annotated like any other code.
+- Tests needing network or real credentials are marked, deselected by default, and given their own
+  task. They never run in CI.
+- Do not run the suite after every edit — run it when asked or when verifying a fix.
+- A test failing after a change is fixed before the work is reported done.
+
+## Shipping
+
+### Git
 
 - Conventional Commits.
 - Commit or push only when asked. Branch first if on the default branch.
 - Never commit a secret or a generated cache directory.
 
-## CI
+### CI
 
 - Pin actions to a full SHA or explicit tag, never `@main`.
 - Use mise so tool versions match local development.
 - Lint, typecheck, test only. `mise run ci` reproduces CI locally.
 - Secrets via CI environment secrets or OIDC.
-
-## Behavior
-
-- Read the file, run the tool, check the config rather than guessing at structure or conventions.
-- Ask when genuinely ambiguous; take the sensible default otherwise and say so.
-- Match existing patterns over personal preference.
-- Scope to the request. No refactoring adjacent code or improving what was not asked about.
