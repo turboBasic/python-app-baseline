@@ -90,22 +90,14 @@ single source for every place the application names itself. Never write the name
 | Environment variable prefix | `ENV_PREFIX` from `python_app_baseline.config` |
 | CLI version banner | `_BANNER` in `src/python_app_baseline/cli.py` |
 
-`ENV_PREFIX` lives in `config.py` because environment variable naming is that module's boundary.
+The name is spelled out rather than shortened to `app` because `app` is the Typer instance; one name
+cannot be both. `ENV_PREFIX` lives in `config.py` because environment variable naming is that
+module's boundary.
+
 Build and tooling files — `pyproject.toml`, `mise.toml`, `settings.toml`, `.env.template` — are read
-before Python runs and necessarily spell the name out.
-
-The package name is deliberately the full `python_app_baseline` rather than a short `app`. `app` is
-the conventional name for the Typer instance (`app = typer.Typer()`, `python_app_baseline.cli:app`),
-and a package by the same name makes `from app.cli import app` read as though a thing imports
-itself. A distinct package name also keeps `APP_NAME` — the constant, whose own name never changes —
-visibly separate from the value it holds, which changes with every application built from this
-baseline.
-
-This assumes the distribution name matches the import name after PEP 503 normalisation: dist
-`python-app-baseline`, import `python_app_baseline`. `importlib.metadata.version()` normalises, so
-hyphen-versus-underscore is not a mismatch. A genuine mismatch makes `version()` raise
-`PackageNotFoundError` and `__version__` silently degrade to `0+unknown`, which
-`test_version_is_resolved_from_installed_metadata` exists to catch.
+before Python runs and necessarily spell the name out. Keep the distribution name matching the
+import name, hyphens for underscores: a real mismatch degrades `__version__` silently instead of
+failing, which `test_version_is_resolved_from_installed_metadata` exists to catch.
 
 ### Module boundaries
 
