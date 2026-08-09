@@ -1,6 +1,10 @@
 # Project vocabulary: repository names, tooling and library identifiers.
 # One word per line; case-insensitive unless the entry is capitalised.
 
+# --- Names ---
+Andrii
+Melnyk
+
 # --- Repository and tooling ---
 turboBasic
 actionlint
