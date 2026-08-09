@@ -11,6 +11,7 @@ dependencies = [
   "rich>=13.9",
   "pydantic>=2.10",
   "dynaconf>=3.2",
+  "platformdirs>=4.11.1",
 ]
 
 [project.scripts]

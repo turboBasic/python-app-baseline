@@ -26,16 +26,24 @@ charliermarsh
 tamasfe
 
 # --- Library and API identifiers ---
+appauthor
+appname
 asyncio
+capsys
+getpid
+ingester
 langserver
 levelname
+platformdirs
 pydantic
 pyupgrade
 secho
+timespec
 typer
 
 # --- Config keys ---
 addopts
+autouse
 testpaths
 
 # --- Repository jargon ---
