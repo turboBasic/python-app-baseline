@@ -4,15 +4,17 @@
 
 A conventions baseline that people copy. It ships no service, is published to no package index, and
 `src/python_app_baseline/` is a Typer CLI and a settings loader with no logic beyond proving the
-rules hold. So the realistic risk is not a vulnerability in this code — it is a weak default
-propagating into every repo forked from it.
+rules hold. Almost nothing here runs in production anywhere; what spreads is the shape of it.
 
-Both are in scope:
+Two things are in scope, and the second matters more:
 
-- A flaw in `src/python_app_baseline/`.
-- A convention in [`docs/ai-instructions.md`](docs/ai-instructions.md) that leads a contributor
-  somewhere unsafe — a rule that invites credential leakage, a quality gate weak enough to wave
-  something through, a dependency or pinned action that should not be trusted.
+- **A vulnerability in `src/python_app_baseline/`** — a resolved secret reaching a log record or the
+  terminal, the settings loader trusting input it should not, a log file landing somewhere it should
+  not. A small surface, but it is copied verbatim into other repos.
+- **A convention in [`docs/ai-instructions.md`](docs/ai-instructions.md) that leads a contributor
+  somewhere unsafe** — a rule that invites credential leakage, a quality gate weak enough to wave
+  something through, a dependency or pinned action that should not be trusted. This is the one worth
+  hunting for: a weak default here propagates into every repo forked from this one.
 
 There are no supported versions to list. `main` is the only thing maintained; if you forked, you own
 your copy.
