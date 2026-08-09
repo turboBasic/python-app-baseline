@@ -2,6 +2,8 @@
 python = "3.14"
 uv = "latest"
 "1password-cli" = "latest"
+actionlint = "latest"
+shellcheck = "latest"
 
 [env]
 _.python.venv = { path = ".venv", create = true }
@@ -18,8 +20,11 @@ description = "Format code with ruff"
 run = "uv run ruff format ."
 
 [tasks.lint]
-description = "Lint code with ruff"
-run = "uv run ruff check ."
+description = "Lint code with ruff and workflows with actionlint"
+run = [
+  "uv run ruff check .",
+  "actionlint",
+]
 
 [tasks.typecheck]
 description = "Type-check with pyright"
