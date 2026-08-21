@@ -1,5 +1,0 @@
-{
-  "name": "pyright-lsp",
-  "description": "Project-local Pyright LSP server, run via `uv run` against this repo's pinned pyright instead of a global install.",
-  "lspServers": "./.lsp.json"
-}
