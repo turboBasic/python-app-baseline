@@ -38,7 +38,7 @@ mise run ci      # lint, typecheck, test — exactly what CI runs
 
 `mise run lint`, `typecheck`, `test`, and `fmt` run the pieces while iterating.
 
-CI calls [`turboBasic/github-actions`](https://github.com/turboBasic/github-actions) at `@v2` and
+CI calls [`turboBasic/github-actions`](https://github.com/turboBasic/github-actions) at `@v4` and
 runs these same tasks, so there is nothing in CI to reproduce separately.
 
 ## Pull requests

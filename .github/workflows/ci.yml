@@ -15,6 +15,6 @@ concurrency:
 
 jobs:
   ci:
-    uses: turboBasic/github-actions/.github/workflows/python-ci.yml@v2
+    uses: turboBasic/github-actions/.github/workflows/python-ci.yml@v4
     permissions:
       contents: read
