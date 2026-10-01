@@ -1,7 +1,5 @@
 {
-  "enabledPlugins": {
-    "hygiene@turbobasic": true
-  },
+  "enabledPlugins": {},
   "extraKnownMarketplaces": {
     "turbobasic": {
       "source": {
